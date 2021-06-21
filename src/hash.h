@@ -22,5 +22,6 @@ bool  hash_cheio(Hash *ha);
 bool  hash_getElemento(Hash *ha, int chave);
 bool  hash_vazio(Hash *ha);
 void  hash_imprimir(Hash *ha);
+int hash_buscar(Hash *ha, int chave);
 
 #endif
