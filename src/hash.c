@@ -15,7 +15,7 @@ struct hash{
 //0 - sondagemLinear
 //1 - sondagemQuadratica
 //2 - duploHash
-int estrategiaConflito = 1;
+int estrategiaConflito = 2;
 
 
 /**************************************
@@ -25,18 +25,22 @@ int hash_funcao(Hash* h, int chave){
 	return chave % h->tamanho;	
 }
 
+
 int hash_funcao_multiplicacao(Hash* h, int chave){
 	float constanteFracionaria = 0.8897;
 	float temp = chave * constanteFracionaria;
 	temp = temp - (int)temp;
 	return (int) (temp*h->tamanho);	
 }
+
+
 int sondagemLinear(Hash *h, int hashPos){
 	while(h->itens[hashPos] != NULL){
 		hashPos = hash_funcao(h, hashPos+1);
 	}
 	return hashPos;
 }
+
 
 int sondagemQuadratica(Hash *h, int hashPos){
 	float c1 = 0.4;
@@ -50,24 +54,27 @@ int sondagemQuadratica(Hash *h, int hashPos){
 		if(h->itens[pos] == NULL) return pos;
 		i++;
 	}
-	return sondagemLinear(h, hashPos);
+	return -1;
 }
 
+
 int duploHash(Hash *h, int hashPos, int hashPos2){
-	for(int i = 0; i< h->tamanho; i++){
-		int pos = hashPos + (i*hashPos2);
-		if (pos>=h->tamanho){
-			pos = pos % h->tamanho;
-		}
+	int i = 1, pos = hashPos;
+	while(h->itens[pos] != NULL){
+		pos = hashPos + (i * hashPos2);
+		if (pos >= h->tamanho)
+			pos = hash_funcao(h, pos);
 		if(h->itens[pos] == NULL) return pos;
+		i++;
 	}
-	return sondagemLinear(h, hashPos);
+	return -1;
 }
 
 
 bool hash_ehValida(Hash* h){
     return (h != NULL? true: false);
 }
+
 
 int hash_get_next_node(Hash* h, int chave){
 	int hashPos = hash_funcao(h, chave);
@@ -80,9 +87,10 @@ int hash_get_next_node(Hash* h, int chave){
 	}
 	else if(estrategiaConflito == 2){
 		int hashPos2 = hash_funcao_multiplicacao(h, chave);
-		return duploHash(h, hashPos, hashPos2);
+		return duploHash(h, hashPos+1, hashPos2+1);
 	}	
 }
+
 
 int buscaSondagemLinear(Hash *h, int chave){	
 	int pos = hash_funcao(h, chave);
@@ -113,18 +121,23 @@ int buscaSondagemQuadratica(Hash *h, int chave){
 	return buscaSondagemLinear(h, chave);
 }
 
+
 int buscaSondagemDupla(Hash *h, int chave){	
 	int hashPos = hash_funcao(h, chave);
 	int hashPos2 = hash_funcao_multiplicacao(h, chave);
+	int pos = hashPos, i = 1;
 	if(h->itens[hashPos]->chave==chave) return hashPos;
-	for(int i = 0; i< h->tamanho; i++){
-		int pos = hashPos + (i*hashPos2);
-		if (pos>=h->tamanho){
-			pos = pos % h->tamanho;
-		}
+	if(h->itens[hashPos2]->chave==chave) return hashPos2;
+	hashPos++;
+	hashPos2++;
+	while(h->itens[pos] != NULL){
+		pos = hashPos + (i * hashPos2);
+		if (pos >= h->tamanho)
+			pos = hash_funcao(h, pos);		
 		if(h->itens[pos]->chave==chave) return pos;
+		i++;
 	}
-	return buscaSondagemLinear(h, chave);
+	return -1;
 }
 /**************************************
 * IMPLEMENTAÇÃO
