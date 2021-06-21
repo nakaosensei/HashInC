@@ -39,4 +39,3 @@ int main(int argc, char *argv[ ]){
 	srand(time(NULL));
 	teste1(argc, argv);
 }
-

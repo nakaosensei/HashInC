@@ -1,6 +1,7 @@
 #include "hash.h"
 
 #define TAM_INICIAL 100000
+#define EST_CONFLITO 2
 
 /**************************************
 * DADOS
@@ -30,6 +31,12 @@ int hash_funcao_multiplicacao(Hash* h, int chave){
 	temp = temp - (int)temp;
 	return (int) (temp*h->tamanho);	
 }
+int sondagemLinear(Hash *h, int hashPos){
+	while(h->itens[hashPos] != NULL){
+		hashPos = hash_funcao(h, hashPos+1);
+	}
+	return hashPos;
+}
 
 int sondagemQuadratica(Hash *h, int hashPos){
 	float c1 = 0.4;
@@ -43,7 +50,7 @@ int sondagemQuadratica(Hash *h, int hashPos){
 		if(h->itens[pos] == NULL) return pos;
 		i++;
 	}
-	return -1;
+	return sondagemLinear(h, hashPos);
 }
 
 int duploHash(Hash *h, int hashPos, int hashPos2){
@@ -54,15 +61,9 @@ int duploHash(Hash *h, int hashPos, int hashPos2){
 		}
 		if(h->itens[pos] == NULL) return pos;
 	}
-	return -1;
+	return sondagemLinear(h, hashPos);
 }
 
-int sondagemLinear(Hash *h, int hashPos){
-	while(h->itens[hashPos] != NULL){
-		hashPos = hash_funcao(h, hashPos+1);
-	}
-	return hashPos;
-}
 
 bool hash_ehValida(Hash* h){
     return (h != NULL? true: false);
@@ -109,7 +110,7 @@ int buscaSondagemQuadratica(Hash *h, int chave){
 		if(h->itens[pos]->chave == chave) return pos;
 		i++;
 	}
-	return -1;
+	return buscaSondagemLinear(h, chave);
 }
 
 int buscaSondagemDupla(Hash *h, int chave){	
@@ -123,7 +124,7 @@ int buscaSondagemDupla(Hash *h, int chave){
 		}
 		if(h->itens[pos]->chave==chave) return pos;
 	}
-	return -1;	
+	return buscaSondagemLinear(h, chave);
 }
 /**************************************
 * IMPLEMENTAÇÃO
