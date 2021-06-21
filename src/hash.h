@@ -10,6 +10,7 @@ struct registro {
   int dado;
 };
 
+
 typedef struct registro TipoElemento;
 typedef struct hash Hash;
 
@@ -22,5 +23,6 @@ bool  hash_cheio(Hash *ha);
 bool  hash_getElemento(Hash *ha, int chave);
 bool  hash_vazio(Hash *ha);
 void  hash_imprimir(Hash *ha);
+int   hash_buscar(Hash *h, int chave);
 
 #endif

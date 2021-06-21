@@ -11,19 +11,15 @@ struct hash{
   TipoElemento **itens;
 };
 
+//0 - sondagemLinear
+//1 - sondagemQuadratica
+//2 - duploHash
+int estrategiaConflito = 1;
+
 
 /**************************************
 * FUNÇÕES AUXILIARES
 **************************************/
-
-/*
-int sondagemLinear(Hash *h, int hashPos){	
-	for (int i = hashPos+1; i < h->tamanho;i++){
-		if(h->itens[i] == NULL)	return i;		
-	}	
-	return -1;
-}*/
-
 int hash_funcao(Hash* h, int chave){
 	return chave % h->tamanho;	
 }
@@ -35,14 +31,17 @@ int hash_funcao_multiplicacao(Hash* h, int chave){
 	return (int) (temp*h->tamanho);	
 }
 
-int sondagemQuadratica(Hash *h, int hashPos){	
-	int c1=0.4;int c2=0.6;
-	for (int i = hashPos; i < h->tamanho;i++){
-		int pos = hashPos+(c1*i)+(c2*(i*i));
-		if (pos>=h->tamanho){
-			pos = pos % h->tamanho;//encaixa dentro do tamanho do vetor
-		}		
+int sondagemQuadratica(Hash *h, int hashPos){
+	float c1 = 0.4;
+	float c2 = 0.6;
+	int i = 1;
+	int pos = hashPos;
+	while(h->itens[pos] != NULL){
+		int pos = hashPos + (c1 * i) + (c2 * (i * i));
+		if (pos >= h->tamanho)
+			pos = hash_funcao(h, pos);
 		if(h->itens[pos] == NULL) return pos;
+		i++;
 	}
 	return -1;
 }
@@ -69,15 +68,17 @@ bool hash_ehValida(Hash* h){
     return (h != NULL? true: false);
 }
 
-int hash_get_next_node(Hash* h, int chave, int estrategiaConflito){
-	int hashPos=hash_funcao(h, chave);
-	if (h->itens[hashPos]==NULL) return hashPos;	
-	if (estrategiaConflito==0){
-		return sondagemLinear(h,hashPos);
-	}else if (estrategiaConflito==1){
-		return sondagemQuadratica(h,hashPos);
-	}else if(estrategiaConflito==2){
-		int hashPos2 = hash_funcao_multiplicacao(h,chave);
+int hash_get_next_node(Hash* h, int chave){
+	int hashPos = hash_funcao(h, chave);
+	if(h->itens[hashPos] == NULL) return hashPos;
+	if(estrategiaConflito == 0){
+		return sondagemLinear(h, hashPos);
+	}
+	else if(estrategiaConflito == 1){
+		return sondagemQuadratica(h, hashPos);
+	}
+	else if(estrategiaConflito == 2){
+		int hashPos2 = hash_funcao_multiplicacao(h, chave);
 		return duploHash(h, hashPos, hashPos2);
 	}	
 }
@@ -94,16 +95,19 @@ int buscaSondagemLinear(Hash *h, int chave){
 	return -1;
 }
 
-int buscaSondagemQuadratica(Hash *h, int chave){	
+
+int buscaSondagemQuadratica(Hash *h, int chave){
 	int hashPos = hash_funcao(h, chave);
-	if(h->itens[hashPos]->chave==chave) return hashPos;
-	int c1=0.4;int c2=0.6;
-	for (int i = hashPos; i < h->tamanho;i++){		
-		int pos = hashPos+(c1*i)+(c2*(i*i));
-		if (pos>=h->tamanho){
-			pos = pos % h->tamanho;//encaixa dentro do tamanho do vetor
-		}		
-		if(h->itens[pos]->chave==chave) return pos;
+	if(h->itens[hashPos]->chave == chave) return hashPos;
+	float c1 = 0.4, c2 = 0.6;
+	int pos = hashPos, i = 1;
+
+	while(h->itens[pos] != NULL){
+		pos = hashPos + (c1 * i) + (c2 * (i * i));
+		if (pos >= h->tamanho)
+			pos = hash_funcao(h, pos);
+		if(h->itens[pos]->chave == chave) return pos;
+		i++;
 	}
 	return -1;
 }
@@ -149,39 +153,40 @@ void  hash_destruir(Hash** enderecoHash){
 
 
 bool hash_inserir(Hash *h, TipoElemento *elemento){
-	int estrategiaConflito=0;//0 = sondagem linear, 1 = sondagem dupla, 2 = duplo hash
-	int pos = hash_get_next_node(h, elemento->chave, estrategiaConflito);
+	int pos = hash_get_next_node(h, elemento->chave);
 	h->itens[pos] = elemento;
 	h->qtde++;
 	return true;
 }
 
 int hash_buscar(Hash *h, int chave){
-	int estrategiaConflito=0;//0 = sondagem linear, 1 = sondagem dupla, 2 = duplo hash
-	int hashPos=hash_funcao(h, chave);
+	int hashPos = hash_funcao(h, chave);
 	int pos;	
-	if (estrategiaConflito==0){
-		pos = buscaSondagemLinear(h,chave);
-	}else if (estrategiaConflito==1){
-		pos = buscaSondagemQuadratica(h,chave);
-	}else if(estrategiaConflito==2){
-		pos = buscaSondagemDupla(h,chave);
+	if (estrategiaConflito == 0){
+		pos = buscaSondagemLinear(h, chave);
+	}
+	else if(estrategiaConflito == 1){
+		pos = buscaSondagemQuadratica(h, chave);
+	}
+	else if(estrategiaConflito == 2){
+		pos = buscaSondagemDupla(h, chave);
 	}
 	if (pos==-1) return -1;
 	return h->itens[pos]->dado;
 }
 
 bool hash_remover(Hash *h, int chave, TipoElemento **elemento){
-	int estrategiaConflito=0;//0 = sondagem linear, 1 = sondagem dupla, 2 = duplo hash
-	int pos;	
-	if (estrategiaConflito==0){
-		pos = buscaSondagemLinear(h,chave);
-	}else if (estrategiaConflito==1){
-		pos = buscaSondagemQuadratica(h,chave);
-	}else if(estrategiaConflito==2){
-		pos = buscaSondagemDupla(h,chave);
+	int pos;
+	if(estrategiaConflito == 0){
+		pos = buscaSondagemLinear(h, chave);
 	}
-	if (pos==-1) return false;
+	else if(estrategiaConflito == 1){
+		pos = buscaSondagemQuadratica(h, chave);
+	}
+	else if(estrategiaConflito == 2){
+		pos = buscaSondagemDupla(h, chave);
+	}
+	if(pos==-1) return false;
 	*elemento = h->itens[pos];  
 	h->itens[pos] = NULL;
 	h->qtde--;

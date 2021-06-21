@@ -9,56 +9,34 @@ int randomInteger (int low, int high){
     int k = d * (high - low + 1);
     return low + k;
 }
-
 int teste1(int argc, char *argv[ ]){
-	Hash *h = hash_criar(5);
-	
-	for (int i =0; i< 5; i++){
-		TipoElemento *r = (TipoElemento*) malloc(sizeof(TipoElemento));	
-		r->chave = i;
-		hash_inserir(h, r);
+	Hash *h = hash_criar(5);	
+	TipoElemento *r = (TipoElemento*) malloc(5 * sizeof(TipoElemento));
+	r[0].chave = 0;
+	r[1].chave = 1;
+	r[2].chave = 4;
+	r[3].chave = 8;
+	r[4].chave = 9;//colisão
+
+	for (int i = 0; i < 5; i++){//insere os elementos
+		r[i].dado = randomInteger(10, 4);
+		hash_inserir(h, &r[i]);
 	}
+
+	for (int i = 0; i< 5; i++){//imprime as chaves e seus respectivos dados
+		printf("chave: %d - %d\n", r[i].chave, r[i].dado);
+	}
+	printf("\n");
 	hash_imprimir(h);
-	TipoElemento *r1 = NULL;
-	hash_remover(h, 5, &r1);
-	hash_imprimir(h);
-	hash_remover(h, 5, &r1);
-	hash_imprimir(h);
-	hash_remover(h, 5, &r1);
-	hash_imprimir(h);
-	hash_remover(h, 4, &r1);
-	hash_imprimir(h);
-	hash_remover(h, 4, &r1);
-	hash_imprimir(h);
-	hash_destruir(&h);
+	for (int i = 0; i< 5; i++){//imprime o buscar
+		int achou = hash_buscar(h, r[i].chave);
+		printf("\nChave[%d] -> valor[%d]\n", r[i].chave, achou);
+	}
 }
 
 int main(int argc, char *argv[ ]){
 	int tamanho = atoi(argv[1]);
-	Hash *h = hash_criar(tamanho);
-
-	while (!hash_cheio(h)){
-		TipoElemento *r = (TipoElemento*) malloc(sizeof(TipoElemento));	
-		r->chave = randomInteger(0,tamanho);
-		r->dado = r->chave;
-		if (!hash_inserir(h, r)){
-			free(r);
-		}
-		
-	}
-	printf("%d\n", hash_tamanho(h));
-	
-	while (!hash_vazio(h)){
-
-		TipoElemento *r = NULL;
-			
-		if (hash_remover(h, randomInteger(0,tamanho), &r)){
-			free(r);
-			r = NULL;
-		}
-		
-	}
-	printf("%d\n", hash_tamanho(h));
-	hash_destruir(&h);
+	srand(time(NULL));
+	teste1(argc, argv);
 }
 
