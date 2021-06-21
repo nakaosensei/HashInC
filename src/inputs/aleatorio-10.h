@@ -1,0 +1,2 @@
+int size = 10;
+TipoElemento vetor[ ] = {{.chave = 3, .dado = 1880}, {.chave = 0, .dado = 9941}, {.chave = 9, .dado = 4543}, {.chave = 1, .dado = 3973}, {.chave = 5, .dado = 6417}, {.chave = 6, .dado = 1935}, {.chave = 4, .dado = 4105}, {.chave = 2, .dado = 5633}, {.chave = 8, .dado = 7625}, {.chave = 7, .dado = 6055}};
