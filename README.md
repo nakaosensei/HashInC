@@ -20,4 +20,33 @@ long int hash_get_next_node(Hash* h, long int chave){
 		return duploHash(h, hashPos+1, hashPos2+1);
 	}	
 }
+long int sondagemLinear(Hash *h, long int hashPos){
+	while(h->itens[hashPos] != NULL){
+		hashPos = hash_funcao(h, hashPos+1);
+	}
+	return hashPos;
+}
+long int sondagemQuadratica(Hash *h, long int hashPos){
+	float c1 = 0.4;
+	float c2 = 0.6;
+	long int i = 1;
+	long int pos = hashPos;
+	while(h->itens[pos] != NULL){
+		int pos = hashPos + (c1 * i) + (c2 * (i * i));
+		pos = pos % h->tamanho;
+		if(h->itens[pos] == NULL) return pos;
+		i++;
+	}
+	return -1;
+}
+long int duploHash(Hash *h, long int hashPos, long int hashPos2){
+	long int i = 1, pos = hashPos;
+	while(h->itens[pos] != NULL){
+		pos = hashPos + (i * hashPos2);
+		pos = pos % h->tamanho;
+		if(h->itens[pos] == NULL) return pos;
+		i++;
+	}
+	return -1;
+}
 ```
