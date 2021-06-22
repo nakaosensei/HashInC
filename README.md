@@ -1,39 +1,37 @@
 # Inserção na Hash
 ```
-int hash_buscar(Hash *h, long int chave){
-	long int hashPos = hash_funcao(h, chave);
-	long int pos;	
-	if (estrategiaConflito == 0){
-		pos = buscaSondagemLinear(h, chave);
-	}else if(estrategiaConflito == 1){
-		pos = buscaSondagemQuadratica(h, chave);
-	}else if(estrategiaConflito == 2){
-		pos = buscaSondagemDupla(h, chave);
-	}
-	if (pos==-1) return -1;
-	return h->itens[pos]->dado;
+bool hash_inserir(Hash *h, TipoElemento *elemento){
+	long int pos = hash_get_next_node(h, elemento->chave);
+	h->itens[pos] = elemento;
+	h->qtde++;
+	return true;
 }
-long int buscaSondagemLinear(Hash *h, long int chave){	
-	long int pos = hash_funcao(h, chave);
-	while(h->itens[pos] != NULL){
-		if(h->itens[pos]->chave == chave){
-			return pos;
-		}else{
-			pos = hash_funcao(h, pos+1);
-		}
-	}
-	return -1;
-}
-long int buscaSondagemQuadratica(Hash *h, long int chave){
+long int hash_get_next_node(Hash* h, long int chave){
 	long int hashPos = hash_funcao(h, chave);
-	if(h->itens[hashPos]->chave == chave) return hashPos;
-	float c1 = 0.4, c2 = 0.6;
-	long int pos = hashPos, i = 1;
-	int tentativa = 0;
+	if(h->itens[hashPos] == NULL) return hashPos;
+	if(estrategiaConflito == 0){
+		return sondagemLinear(h, hashPos);
+	}
+	else if(estrategiaConflito == 1){
+		return sondagemQuadratica(h, hashPos);
+	}
+	else if(estrategiaConflito == 2){
+		long int hashPos2 = hash_funcao_multiplicacao(h, chave);
+		return duploHash(h, hashPos+1, hashPos2+1);
+	}	
+}
+long int sondagemLinear(Hash *h, long int hashPos){
+	while(h->itens[hashPos] != NULL){
+		hashPos = hash_funcao(h, hashPos+1);
+	}
+	return hashPos;
+}
+long int sondagemQuadratica(Hash *h, long int hashPos){
+	float c1 = 0.4;float c2 = 0.6;long int i = 1;long int pos = hashPos;int tentativa = 0;
 	while(h->itens[pos] != NULL){
 		pos = hashPos + (c1 * i) + (c2 * (i * i));
 		pos = hash_funcao(h, pos);
-		if(h->itens[pos]->chave == chave) return pos;
+		if(h->itens[pos] == NULL) return pos;
 		i++;
 		if(i > 500){
 			tentativa++;
@@ -42,28 +40,22 @@ long int buscaSondagemQuadratica(Hash *h, long int chave){
 			i = 0;
 		}
 		if(tentativa == 3){
-			return buscaSondagemLinear(h, chave);
+			return sondagemLinear(h, hashPos);
 		}
 	}
-	return buscaSondagemLinear(h, chave);
+	return sondagemLinear(h, hashPos);
 }
-long int buscaSondagemDupla(Hash *h, long int chave){	
-	long int hashPos = hash_funcao(h, chave);
-	long int hashPos2 = hash_funcao_multiplicacao(h, chave);
-	long int pos = hashPos, i = 1;
-	if(h->itens[hashPos]->chave==chave) return hashPos;
-	if(h->itens[hashPos2]->chave==chave) return hashPos2;
-	hashPos++;
-	hashPos2++;
+long int duploHash(Hash *h, long int hashPos, long int hashPos2){
+	long int i = 1, pos = hashPos;
 	while(h->itens[pos] != NULL){
 		pos = hashPos + (i * hashPos2);
-		pos = hash_funcao(h, pos);		
-		if(h->itens[pos]->chave==chave) return pos;
+		pos = hash_funcao(h, pos);
+		if(h->itens[pos] == NULL) return pos;
 		i++;
 		if(i == 500){
-			return buscaSondagemLinear(h, chave);
+			return sondagemLinear(h, hashPos);
 		}
 	}
-	return buscaSondagemLinear(h, chave);
+	return sondagemLinear(h, hashPos);
 }
 ```
