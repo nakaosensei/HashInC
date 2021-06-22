@@ -105,7 +105,8 @@ int buscaSondagemQuadratica(Hash *h, int chave){
 			pos = pos % h->tamanho;//encaixa dentro do tamanho do vetor
 		}		
 		if(h->itens[pos]->chave==chave) return pos;
-	}
+	}	
+
 	return buscaSondagemLinear(h, chave);
 }
 
