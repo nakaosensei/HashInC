@@ -2,7 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include "hash.h"
-#include "inputs/aleatorio-10000.h"
+
 #define CLOCKTYPE CLOCK_MONOTONIC
 
 int randomInteger (int low, int high){
