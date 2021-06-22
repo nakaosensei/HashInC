@@ -2,7 +2,8 @@
 #include <string.h>
 #include <time.h>
 #include "hash.h"
-#include "inputs/aleatorio-100.h"
+#include "inputs/aleatorio-10000.h"
+#define CLOCKTYPE CLOCK_MONOTONIC
 
 int randomInteger (int low, int high){
     double d;
@@ -13,19 +14,28 @@ int randomInteger (int low, int high){
 
 
 int teste1(){
+    struct timespec tsi, tsf;
+    double elaps_s = 0.0;
+    long elaps_ns = 0;
+    clock_gettime(CLOCKTYPE, &tsi);	
 	Hash *h = hash_criar(size);
-	for (int i = 0; i < size; i++){//insere os elementos		
+	for (long int i = 0; i < size; i++){//insere os elementos		
 		hash_inserir(h, &vetor[i]);
 	}
-	for (int i = 0; i < size; i++){//imprime as chaves e seus respectivos dados
-		printf("chave: [%d] -> [%d]\n", vetor[i].chave, vetor[i].dado);
-	}
-	printf("\nPrint hash keys: ");
-	hash_imprimir(h);
-	for (int i = 0; i< size; i++){//imprime o buscar
-		int achou = hash_buscar(h, vetor[i].chave);
-		printf("\nChave[%d] -> valor[%d]\n", vetor[i].chave, achou);
-	}
+	clock_gettime(CLOCKTYPE, &tsf);
+	elaps_s = difftime(tsf.tv_sec, tsi.tv_sec);
+	elaps_ns = tsf.tv_nsec - tsi.tv_nsec;
+    printf("Tempo : %lf s", (elaps_s + ((double)elaps_ns) / 1.0e9));
+
+	// for (int i = 0; i < size; i++){//imprime as chaves e seus respectivos dados
+	// 	printf("chave: [%d] -> [%d]\n", vetor[i].chave, vetor[i].dado);
+	// }
+	// printf("\nPrint hash keys: ");
+	// hash_imprimir(h);
+	// for (int i = 0; i< size; i++){//imprime o buscar
+	// 	int achou = hash_buscar(h, vetor[i].chave);
+	// 	printf("\nChave[%d] -> valor[%d]\n", vetor[i].chave, achou);
+	// }
 }
 
 int main(int argc, char *argv[ ]){

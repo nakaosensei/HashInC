@@ -1,14 +1,17 @@
 import random 
 
 if __name__ == '__main__':
-    finalPoint = 100    
+    finalPoint = 10000
 
-    while finalPoint <= 1000000:
+    while finalPoint <= 10000000:
         i = 0
-        a = list(range(0,finalPoint))
-        random.shuffle(a)        
-        f = open('./inputs/aleatorio'+'-'+str(finalPoint)+'.h','w')
-        vetor = 'int size = ' + str(finalPoint) + ";\n";
+        # a = list(range(0,finalPoint))
+        a = list()
+        for x in range(0, finalPoint):
+            a.append(finalPoint*x)
+        # random.shuffle(a)
+        f = open('./inputs/conflito'+'-'+str(finalPoint)+'.h','w')
+        vetor = 'long int size = ' + str(finalPoint) + ";\n";
         vetor += 'TipoElemento vetor[ ] = {'
         while i < finalPoint:
             number = random.randrange(0, 10000)
