@@ -1,15 +1,13 @@
 # Inserção na Hash
 ```
 int hash_buscar(Hash *h, long int chave){
-	long int hashPos = hash_funcao(h, chave);
-	long int pos;	
+	long int hashPos = hash_funcao(h, chave);long int pos;	
 	if (estrategiaConflito == 0){
 		pos = buscaSondagemLinear(h, chave);
 	}
 	else if(estrategiaConflito == 1){
 		pos = buscaSondagemQuadratica(h, chave);
-	}
-	else if(estrategiaConflito == 2){
+	}else if(estrategiaConflito == 2){
 		pos = buscaSondagemDupla(h, chave);
 	}
 	if (pos==-1) return -1;
