@@ -2,6 +2,7 @@
 #include <string.h>
 #include <time.h>
 #include "hash.h"
+#include "inputs/aleatorio-100.h"
 
 int randomInteger (int low, int high){
     double d;
@@ -10,33 +11,25 @@ int randomInteger (int low, int high){
     return low + k;
 }
 
-int teste1(int argc, char *argv[ ]){
-	Hash *h = hash_criar(5);	
-	TipoElemento *r = (TipoElemento*) malloc(5 * sizeof(TipoElemento));
-	r[0].chave = 0;
-	r[1].chave = 1;
-	r[2].chave = 4;
-	r[3].chave = 8;
-	r[4].chave = 9;//colisão
 
-	for (int i = 0; i < 5; i++){//insere os elementos
-		r[i].dado = randomInteger(10, 4);
-		hash_inserir(h, &r[i]);
+int teste1(){
+	Hash *h = hash_criar(size);
+	for (int i = 0; i < size; i++){//insere os elementos		
+		hash_inserir(h, &vetor[i]);
 	}
-
-	for (int i = 0; i< 5; i++){//imprime as chaves e seus respectivos dados
-		printf("chave: %d - %d\n", r[i].chave, r[i].dado);
+	for (int i = 0; i < size; i++){//imprime as chaves e seus respectivos dados
+		printf("chave: [%d] -> [%d]\n", vetor[i].chave, vetor[i].dado);
 	}
-	printf("\n");
+	printf("\nPrint hash keys: ");
 	hash_imprimir(h);
-	for (int i = 0; i< 5; i++){//imprime o buscar
-		int achou = hash_buscar(h, r[i].chave);
-		printf("\nChave[%d] -> valor[%d]\n", r[i].chave, achou);
+	for (int i = 0; i< size; i++){//imprime o buscar
+		int achou = hash_buscar(h, vetor[i].chave);
+		printf("\nChave[%d] -> valor[%d]\n", vetor[i].chave, achou);
 	}
 }
 
 int main(int argc, char *argv[ ]){
 	int tamanho = atoi(argv[1]);
-	teste1(argc, argv);
-	srand(time(NULL));	
+	srand(time(NULL));
+	teste1();
 }
